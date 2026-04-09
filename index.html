@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9 Singha Broker - ID Card & Lanyard System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ════════════════════════════════
+           2026 NEO-CORPORATE THEME
+        ════════════════════════════════ */
+        :root {
+            --brand-red:   #A31D24; /* สีแดง 9 สิงห์ */
+            --brand-gold:  #C49B4F; /* สีทองแชมเปญ */
+            --bg-color:    #F4F6F9; /* สีพื้นหลังสว่าง คลีน */
+            --surface-bg:  rgba(255, 255, 255, 0.9); /* พื้นหลังแบบกระจก */
+            --text-dark:   #1A1D20;
+            --text-muted:  #6B7280;
+            --border-light:#E5E7EB;
+            --success:     #10B981;
+            --danger:      #EF4444;
+            --radius-xl:   24px;
+            --radius-md:   12px;
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.04);
+            --transition:  all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(163, 29, 36, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(196, 155, 79, 0.08) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            color: var(--text-dark);
+        }
+
+        .shell { width: 100%; max-width: 600px; position: relative; }
+
+        /* ── HEADER ── */
+        .app-header { text-align: center; margin-bottom: 24px; position: relative; }
+        
+        .logo-mark {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--brand-red), #801218);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700;
+            margin: 0 auto 16px;
+            box-shadow: 0 4px 15px rgba(163, 29, 36, 0.3);
+            transform: rotate(45deg);
+        }
+        .logo-mark span { transform: rotate(-45deg); }
+
+        .app-header h1 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--brand-red); letter-spacing: 1px; margin-bottom: 6px; }
+        .app-header .tagline { font-size: 13px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 500; }
+
+        .admin-pill {
+            position: absolute; top: 0; right: 0;
+            background: white; border: 1px solid var(--border-light); color: var(--text-muted);
+            padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; transition: var(--transition); box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .admin-pill:hover { border-color: var(--brand-gold); color: var(--brand-gold); }
+
+        /* ── CARD (Glassmorphism) ── */
+        .card {
+            background: var(--surface-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6); border-radius: var(--radius-xl); box-shadow: var(--shadow-glass); overflow: hidden;
+        }
+
+        /* ── STEPPER ── */
+        .wizard-steps { display: flex; padding: 24px 30px; border-bottom: 1px solid var(--border-light); background: rgba(255,255,255,0.5); }
+        .step-item { display: flex; align-items: center; gap: 10px; flex: 1; opacity: 0.5; transition: var(--transition); }
+        .step-item.active, .step-item.done { opacity: 1; }
+        .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--border-light); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; transition: var(--transition); }
+        .step-item.active .step-num { background: var(--brand-gold); color: white; box-shadow: 0 0 15px rgba(196, 155, 79, 0.4); }
+        .step-item.done .step-num { background: var(--text-dark); color: white; }
+        .step-item.done .step-num::after { content: "✓"; }
+        .step-item.done .step-num span { display: none; }
+        .step-label { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+        .step-connector { flex: 1; height: 2px; background: var(--border-light); margin: 0 10px; border-radius: 2px; }
+        .step-connector.done { background: var(--text-dark); }
+
+        /* ── FORM ── */
+        .form-body { padding: 30px; }
+        .form-section { display: none; animation: fadeUp 0.4s ease; }
+        .form-section.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-label { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: var(--brand-gold); margin-bottom: 24px; text-transform: uppercase; }
+
+        .field-group { margin-bottom: 20px; }
+        .field-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
+        .req { color: var(--brand-red); }
+        
+        input[type="text"], input[type="password"], input[type="number"], select {
+            width: 100%; background: white; border: 1px solid var(--border-light); border-radius: var(--radius-md);
+            padding: 14px 16px; font-family: 'Prompt', sans-serif; font-size: 14px; color: var(--text-dark); transition: var(--transition);
+        }
+        input:focus, select:focus { outline: none; border-color: var(--brand-gold); box-shadow: 0 0 0 3px rgba(196, 155, 79, 0.15); }
+
+        /* ── FILTER TABS ── */
+        .color-filter { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 24px; padding-bottom: 4px; }
+        .color-filter::-webkit-scrollbar { display: none; }
+        .cf-btn { padding: 8px 18px; border-radius: 30px; border: 1px solid var(--border-light); background: white; color: var(--text-muted); font-family: 'Prompt'; font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); }
+        .cf-btn:hover { border-color: var(--brand-gold); color: var(--brand-gold); }
+        .cf-btn.active { background: var(--text-dark); border-color: var(--text-dark); color: white; }
+
+        /* ── PRODUCTS ── */
+        .product-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .product-card { display: flex; align-items: center; gap: 16px; background: white; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 14px; transition: var(--transition); }
+        .product-card:hover { border-color: var(--brand-gold); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .product-card.has-qty { border-color: var(--brand-red); background: rgba(163, 29, 36, 0.02); }
+        
+        .product-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #f0f0f0; background: #fdfdfd; }
+        .product-info { flex: 1; }
+        .product-name { font-weight: 600; font-size: 15px; color: var(--text-dark); margin-bottom: 4px; }
+        .product-stock { font-size: 12px; font-weight: 500; color: var(--success); }
+        .product-stock.out { color: var(--danger); }
+        
+        .qty-stepper { display: flex; align-items: center; border: 1px solid var(--border-light); border-radius: 8px; overflow: hidden; background: white; }
+        .qty-btn { width: 32px; height: 32px; background: transparent; border: none; color: var(--text-dark); font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .qty-btn:hover:not(:disabled) { background: var(--bg-color); color: var(--brand-red); }
+        .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .qty-input { width: 40px !important; height: 32px !important; border: none !important; border-left: 1px solid var(--border-light) !important; border-right: 1px solid var(--border-light) !important; border-radius: 0 !important; text-align: center; font-weight: 600; padding: 0 !important; }
+
+        /* ── SUMMARY ── */
+        .cart-summary { background: var(--bg-color); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 24px; display: none; }
+        .cart-summary.visible { display: block; animation: fadeUp 0.3s ease; }
+        .cart-summary-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;}
+        .cart-items-list { display: flex; flex-direction: column; gap: 8px; }
+        .cart-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-dark); }
+        .cart-row strong { font-weight: 600; color: var(--brand-red); }
+
+        /* ── BUTTONS ── */
+        .btn-row { display: flex; gap: 12px; }
+        .btn { flex: 1; padding: 16px; border: none; border-radius: var(--radius-md); font-family: 'Prompt'; font-size: 15px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--text-dark); color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary:hover:not(:disabled) { background: var(--brand-red); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(163, 29, 36, 0.2); }
+        .btn-primary:disabled { background: var(--border-light); color: var(--text-muted); box-shadow: none; cursor: not-allowed; transform: none; }
+        .btn-ghost { background: white; border: 1px solid var(--border-light); color: var(--text-dark); }
+        .btn-ghost:hover { border-color: var(--text-dark); }
+
+        /* ── CONFIRM PAGE ── */
+        .confirm-block { background: white; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 20px; margin-bottom: 16px; }
+        .confirm-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(--border-light); font-size: 14px; }
+        .confirm-row:last-child { border-bottom: none; }
+        .confirm-key { color: var(--text-muted); }
+        .confirm-val { font-weight: 600; color: var(--text-dark); text-align: right; }
+
+        /* ── SUCCESS SCREEN ── */
+        .success-screen { text-align: center; padding: 40px 20px; display: none; }
+        .success-screen.active { display: block; }
+        .success-icon { width: 80px; height: 80px; border-radius: 50%; background: #E6F4EA; color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 24px; }
+        
+        #admin-login-view, #admin-dashboard-view { display: none; }
+        .admin-box { background: white; border: 1px solid var(--border-light); padding: 24px; border-radius: var(--radius-md); margin-bottom: 24px; }
+        .dash-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+        .dash-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-md); transition: 0.3s; background: white; border: 1px solid var(--border-light); }
+        .dash-tab.active { background: var(--text-dark); color: white; border-color: var(--text-dark); }
+        .dash-section { display: none; }
+        .dash-section.active { display: block; animation: fadeUp 0.3s ease; }
+        .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: white; border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 12px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .report-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+        .report-table th { background: var(--bg-color); padding: 12px; text-align: left; color: var(--text-muted); font-weight: 600; border-radius: 8px 8px 0 0; }
+        .report-table td { padding: 14px 12px; border-bottom: 1px solid var(--border-light); }
+    </style>
+</head>
+<body>
+
+<div class="shell">
+    <div id="user-view">
+        <div class="app-header">
+            <button class="admin-pill" onclick="switchView('admin-login-view')">Admin</button>
+            <div class="logo-mark"><span>9</span></div>
+            <h1>9 SINGHA BROKER</h1>
+            <p class="tagline">ระบบเบิกกรอบบัตร & สายคล้อง</p>
+        </div>
+
+        <div class="card" id="formCard">
+            <div class="wizard-steps" id="wizardSteps">
+                <div class="step-item active" id="step-ind-1"><div class="step-num"><span>1</span></div><div class="step-label">ข้อมูล</div></div>
+                <div class="step-connector" id="conn-1-2"></div>
+                <div class="step-item" id="step-ind-2"><div class="step-num"><span>2</span></div><div class="step-label">เลือกของ</div></div>
+                <div class="step-connector" id="conn-2-3"></div>
+                <div class="step-item" id="step-ind-3"><div class="step-num"><span>3</span></div><div class="step-label">ยืนยัน</div></div>
+            </div>
+
+            <div class="form-body">
+                <form id="requestForm">
+                    
+                    <div class="form-section active" id="step-1">
+                        <div class="section-label">ข้อมูลผู้ทำรายการ</div>
+
+                        <div class="field-group">
+                            <label class="field-label">ชื่อ-นามสกุล <span class="req">*</span></label>
+                            <input type="text" id="fullName" required placeholder="ระบุชื่อ-นามสกุลพนักงาน">
+                        </div>
+
+                        <div class="field-group">
+                            <label class="field-label">สังกัด / แผนก <span class="req">*</span></label>
+                            <select id="department" required onchange="checkDepartment()">
+                                <option value="">— กรุณาเลือกแผนก —</option>
+                                <option>Marketing Support</option><option>PA1</option><option>PA2</option>
+                                <option>PA RENEW</option><option>HEALTH&amp;CANCER</option><option>MOTOR</option>
+                                <option>RETAIL</option><option>Corperate Sales</option><option>Sales Support</option>
+                                <option>HR</option><option>OFFICE ADMIN</option><option>IT office</option>
+                                <option>Accounting &amp; Finance Office</option><option>ComplianceOffice</option>
+                                <option value="อื่นๆ">อื่นๆ (ระบุเพิ่มเติม)</option>
+                            </select>
+                        </div>
+                        <div class="field-group" id="otherDeptDiv" style="display:none">
+                            <input type="text" id="otherDepartment" placeholder="พิมพ์ชื่อแผนก">
+                        </div>
+
+                        <button type="button" class="btn btn-primary" onclick="goToStep2()">ถัดไป — เลือกอุปกรณ์</button>
+                    </div>
+
+                    <div class="form-section" id="step-2">
+                        <div class="section-label">เลือกอุปกรณ์ที่ต้องการเบิก</div>
+
+                        <div class="color-filter">
+                            <button type="button" class="cf-btn active" onclick="filterItems('all',this)">ทั้งหมด</button>
+                            <button type="button" class="cf-btn" onclick="filterItems('กรอบบัตร',this)">🪪 กรอบบัตร</button>
+                            <button type="button" class="cf-btn" onclick="filterItems('สายคล้อง',this)">🎗 สายคล้องคอ</button>
+                        </div>
+
+                        <div class="product-grid" id="productGrid">
+                            <div style="text-align:center; padding:20px; color:#999;">กำลังโหลดข้อมูล...</div>
+                        </div>
+
+                        <div class="cart-summary" id="cartSummary">
+                            <div class="cart-summary-header"><span>รายการที่เลือก</span><span id="cartTotalCount"></span></div>
+                            <div class="cart-items-list" id="cartItemsList"></div>
+                        </div>
+
+                        <div class="btn-row">
+                            <button type="button" class="btn btn-ghost" style="flex:0 0 auto; padding:16px;" onclick="goToStep(1)">ย้อนกลับ</button>
+                            <button type="button" class="btn btn-primary" id="step2NextBtn" onclick="goToStep3()" disabled>ตรวจสอบรายการ</button>
+                        </div>
+                    </div>
+
+                    <div class="form-section" id="step-3">
+                        <div class="section-label">ตรวจสอบและยืนยัน</div>
+
+                        <div class="confirm-block" id="confirmPersonal"></div>
+                        <div class="confirm-block" id="confirmItems"></div>
+
+                        <div class="btn-row">
+                            <button type="button" class="btn btn-ghost" style="flex:0 0 auto; padding:16px;" onclick="goToStep(2)">ย้อนกลับ</button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">ยืนยันการเบิกอุปกรณ์</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="success-screen" id="successScreen">
+                    <div class="success-icon">✓</div>
+                    <h2 style="font-family: 'Playfair Display'; color: var(--text-dark);">REQUEST SUBMITTED</h2>
+                    <p style="color: var(--text-muted); margin-bottom:24px;">รายการของคุณถูกบันทึกลงระบบเรียบร้อยแล้ว<br>กรุณาติดต่อ HR เพื่อรับอุปกรณ์ครับ</p>
+                    <button class="btn btn-primary" onclick="resetForm()">ทำรายการใหม่</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-login-view">
+        <div class="app-header">
+            <div class="logo-mark"><span>9</span></div>
+            <h1>ADMIN PORTAL</h1>
+        </div>
+        <div class="card" style="padding: 40px 30px;">
+            <div class="field-group">
+                <label class="field-label">รหัสผ่านสำหรับผู้ดูแล</label>
+                <input type="password" id="adminPass" placeholder="กรอกรหัสผ่านแล้วกด Enter" onkeypress="if(event.key==='Enter') loginAdmin()">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="loginAdmin()">เข้าสู่ระบบ</button>
+            <div style="text-align:center; margin-top:20px; font-size:13px; cursor:pointer; color:var(--text-muted);" onclick="switchView('user-view')">← กลับหน้าหลัก</div>
+        </div>
+    </div>
+
+    <div id="admin-dashboard-view">
+        <div class="app-header" style="margin-bottom:16px;">
+            <h1 style="font-size:20px;">INVENTORY DASHBOARD</h1>
+        </div>
+
+        <div class="dash-tabs">
+            <div class="dash-tab active" id="dtab-stock" onclick="switchAdminTab('stock')">📦 สต๊อกสินค้า</div>
+            <div class="dash-tab" id="dtab-history" onclick="switchAdminTab('history')">📜 ประวัติบิล</div>
+            <div class="dash-tab" id="dtab-report" onclick="switchAdminTab('report')">📊 รายงาน AI</div>
+        </div>
+
+        <div class="dash-section active" id="dash-stock">
+            <div class="admin-box">
+                <div class="section-label">เพิ่ม / แก้ไข อุปกรณ์</div>
+                <div class="grid-2">
+                    <div class="field-group"><label class="field-label">รหัส (SKU)</label><input type="text" id="itemId"></div>
+                    <div class="field-group"><label class="field-label">ชื่ออุปกรณ์</label><input type="text" id="itemName" placeholder="เช่น กรอบบัตรสีแดง"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="field-group"><label class="field-label">หน่วยนับ</label><input type="text" id="itemUnit" value="อัน"></div>
+                    <div class="field-group"><label class="field-label">จำนวนสต๊อก</label><input type="number" id="itemStock" min="0"></div>
+                </div>
+                <div class="field-group"><label class="field-label">URL รูปภาพ</label><input type="text" id="itemImage"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="saveItemAdmin()">บันทึก</button>
+                    <button class="btn btn-ghost" onclick="clearAdminForm()">ล้างค่า</button>
+                </div>
+            </div>
+            <div id="adminStockContainer"></div>
+        </div>
+
+        <div class="dash-section" id="dash-history"><div id="adminHistoryContainer"></div></div>
+
+        <div class="dash-section" id="dash-report">
+            <div class="admin-box">
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <div class="section-label" style="margin:0;">รายงานสรุปผล</div>
+                    <select id="reportMonthFilter" onchange="generateReport()" style="width:auto; padding:6px; border-color:var(--border-light); font-weight:600;"></select>
+                </div>
+                <div class="grid-2" style="margin-bottom:20px;">
+                    <div style="background:var(--bg-color); padding:16px; border-radius:12px; text-align:center;">
+                        <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">ยอดบิลเบิก</div>
+                        <div style="font-size:24px; font-weight:700; color:var(--brand-red);" id="reportTotalOrders">0</div>
+                    </div>
+                    <div style="background:var(--bg-color); padding:16px; border-radius:12px; text-align:center;">
+                        <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">จำนวนของชิ้นที่เบิก</div>
+                        <div style="font-size:24px; font-weight:700; color:var(--brand-gold);" id="reportTotalItems">0</div>
+                    </div>
+                </div>
+                <div style="background:rgba(196, 155, 79, 0.1); border:1px solid var(--brand-gold); padding:16px; border-radius:12px; font-size:13px; margin-bottom:20px; line-height:1.6;" id="aiInsightBox"></div>
+                <table class="report-table">
+                    <thead><tr><th>อุปกรณ์</th><th style="text-align:center">เดิม</th><th style="text-align:center">เบิก</th><th style="text-align:center">เหลือ</th></tr></thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button class="btn btn-ghost" style="width:100%; border-color:var(--danger); color:var(--danger); margin-top:16px;" onclick="switchView('user-view')">ออกจากระบบ</button>
+    </div>
+</div>
+
+<script>
+    // ⚠️ นำ URL Web App ของคุณมาใส่ตรงนี้
+    const API_URL = "https://script.google.com/macros/s/AKfycbyQgCh9MaL2aCjmP_0ywlUIs0ZLIAozKG1FqtUQL9I5fQBL4sqn_1k0lfePHEjC0T52uQ/exec"; 
+
+    let globalItems = [], globalHistory = [], currentFilter = 'all', currentStep = 1;
+
+    window.onload = () => { fetchItems(); };
+
+    function fetchItems() {
+        fetch(API_URL).then(r => r.json()).then(data => {
+            globalItems = data.items; globalHistory = data.history;
+            renderProducts(); renderAdminStock(globalItems); renderAdminHistory(globalHistory);
+            populateMonthFilter(); generateReport();
+        }).catch(e => console.log(e));
+    }
+
+    // --- User Flow ---
+    function setStepIndicator(step) {
+        [1,2,3].forEach(i => {
+            let el = document.getElementById(`step-ind-${i}`);
+            el.classList.remove('active', 'done');
+            if (i < step) el.classList.add('done');
+            else if (i === step) el.classList.add('active');
+        });
+        if(document.getElementById('conn-1-2')) document.getElementById('conn-1-2').classList.toggle('done', step > 1);
+        if(document.getElementById('conn-2-3')) document.getElementById('conn-2-3').classList.toggle('done', step > 2);
+    }
+
+    function goToStep(n) {
+        document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(`step-${n}`).classList.add('active');
+        currentStep = n; setStepIndicator(n);
+    }
+
+    function goToStep2() {
+        if (!document.getElementById('fullName').value || !document.getElementById('department').value) {
+            alert('กรุณากรอกข้อมูลให้ครบถ้วน'); return;
+        }
+        goToStep(2);
+    }
+
+    function goToStep3() {
+        let dept = document.getElementById('department').value === 'อื่นๆ' ? document.getElementById('otherDepartment').value : document.getElementById('department').value;
+        document.getElementById('confirmPersonal').innerHTML = `<div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">ข้อมูลผู้เบิก</div><div class="confirm-row"><span class="confirm-key">ชื่อ</span><span class="confirm-val">${document.getElementById('fullName').value}</span></div><div class="confirm-row"><span class="confirm-key">แผนก</span><span class="confirm-val">${dept}</span></div>`;
+        
+        let rows = '';
+        document.querySelectorAll('.app-input').forEach(inp => {
+            let qty = parseInt(inp.value) || 0;
+            if(qty > 0) rows += `<div class="confirm-row"><span class="confirm-key">${inp.dataset.name}</span><span class="confirm-val">${qty} ${inp.dataset.unit}</span></div>`;
+        });
+        document.getElementById('confirmItems').innerHTML = `<div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">รายการอุปกรณ์</div>${rows}`;
+        goToStep(3);
+    }
+
+    function filterItems(kw, el) {
+        currentFilter = kw;
+        document.querySelectorAll('.cf-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active'); renderProducts();
+    }
+
+    function renderProducts() {
+        const grid = document.getElementById('productGrid');
+        let items = currentFilter === 'all' ? globalItems : globalItems.filter(i => i.name.includes(currentFilter));
+        if (!items.length) { grid.innerHTML = `<div style="text-align:center; padding:20px; color:#999;">ไม่พบอุปกรณ์ในหมวดหมู่นี้</div>`; return; }
+
+        grid.innerHTML = items.map(item => {
+            const oos = item.stock <= 0;
+            const img = item.image || `https://via.placeholder.com/150/F4F6F9/A31D24?text=IMAGE`;
+            return `
+            <div class="product-card ${oos ? 'out-of-stock' : ''}" id="pc-${item.id}" style="${oos?'opacity:0.5':''}">
+                <img class="product-img" src="${img}">
+                <div class="product-info">
+                    <div class="product-name">${item.name}</div>
+                    <div class="product-stock ${oos?'out':''}">${oos ? 'ของหมด' : 'พร้อมเบิก ' + item.stock + ' ' + item.unit}</div>
+                </div>
+                <div class="qty-stepper">
+                    <button type="button" class="qty-btn" onclick="changeQty('${item.id}', -1)" ${oos?'disabled':''}>−</button>
+                    <input type="number" class="qty-input app-input" id="qty-${item.id}" data-name="${item.name}" data-unit="${item.unit}" min="0" max="${item.stock}" value="0" ${oos?'disabled':''} oninput="onQtyChange('${item.id}')">
+                    <button type="button" class="qty-btn" onclick="changeQty('${item.id}', 1)" ${oos?'disabled':''}>+</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function changeQty(id, delta) {
+        let inp = document.getElementById(`qty-${id}`); if (!inp) return;
+        inp.value = Math.max(0, Math.min(parseInt(inp.max), (parseInt(inp.value)||0) + delta));
+        onQtyChange(id);
+    }
+
+    function onQtyChange(id) {
+        let inp = document.getElementById(`qty-${id}`);
+        document.getElementById(`pc-${id}`).classList.toggle('has-qty', (parseInt(inp.value)||0) > 0);
+        updateCartSummary();
+    }
+
+    function updateCartSummary() {
+        let items = [];
+        document.querySelectorAll('.app-input').forEach(inp => {
+            let qty = parseInt(inp.value)||0; if(qty>0) items.push({name:inp.dataset.name, qty, unit:inp.dataset.unit});
+        });
+        const summary = document.getElementById('cartSummary'), list = document.getElementById('cartItemsList'), btn = document.getElementById('step2NextBtn');
+        if(!items.length) { summary.classList.remove('visible'); btn.disabled = true; return; }
+        summary.classList.add('visible'); btn.disabled = false;
+        document.getElementById('cartTotalCount').textContent = items.reduce((s,i)=>s+i.qty,0) + " ชิ้น";
+        list.innerHTML = items.map(i => `<div class="cart-row"><span>${i.name}</span><strong>${i.qty} ${i.unit}</strong></div>`).join('');
+    }
+
+    document.getElementById('requestForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let itemsDataArray = [];
+        document.querySelectorAll('.app-input').forEach(inp => {
+            let qty = parseInt(inp.value)||0; if(qty>0) itemsDataArray.push({name:inp.dataset.name, qty});
+        });
+        let btn = document.getElementById('submitBtn'); btn.disabled = true; btn.innerText = "กำลังบันทึก...";
+        
+        const payload = {
+            action: "request_items",
+            fullName: document.getElementById('fullName').value,
+            department: document.getElementById('department').value,
+            otherDepartment: document.getElementById('otherDepartment').value,
+            itemsDataArray
+        };
+
+        fetch(API_URL, { method: "POST", headers: {"Content-Type":"text/plain"}, body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+            if(data.status==="success") {
+                document.getElementById('wizardSteps').style.display='none';
+                document.querySelectorAll('.form-section').forEach(s=>s.classList.remove('active'));
+                document.getElementById('successScreen').classList.add('active');
+                fetchItems();
+            }
+        }).finally(()=>{ btn.disabled=false; btn.innerText="ยืนยันการเบิกอุปกรณ์"; });
+    });
+
+    function resetForm() {
+        document.getElementById('requestForm').reset();
+        document.getElementById('successScreen').classList.remove('active');
+        document.getElementById('wizardSteps').style.display='flex';
+        checkDepartment(); currentFilter='all';
+        document.querySelectorAll('.cf-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+        goToStep(1);
+    }
+
+    function checkDepartment() { document.getElementById('otherDeptDiv').style.display = document.getElementById('department').value === 'อื่นๆ' ? 'block' : 'none'; }
+
+    // --- Admin Flow ---
+    function switchView(v) { ['user-view','admin-login-view','admin-dashboard-view'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById(v).style.display='block'; if(v==='admin-dashboard-view')fetchItems(); }
+    function loginAdmin() { if(document.getElementById('adminPass').value==='adminhr0208'){document.getElementById('adminPass').value='';switchView('admin-dashboard-view');}else alert('รหัสผ่านผิด'); }
+    function switchAdminTab(t) { document.querySelectorAll('.dash-tab').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.dash-section').forEach(x=>x.classList.remove('active')); document.getElementById('dtab-'+t).classList.add('active'); document.getElementById('dash-'+t).classList.add('active'); }
+
+    function renderAdminStock(items) {
+        document.getElementById('adminStockContainer').innerHTML = items.map(i => {
+            let json = JSON.stringify(i).replace(/'/g, "&#39;");
+            return `<div class="admin-list-item"><div><div style="font-size:11px;color:#999;">${i.id}</div><div style="font-weight:600;">${i.name}</div></div><div style="display:flex;align-items:center;gap:12px;"><div style="font-weight:700;color:var(--success);">${i.stock} ${i.unit}</div><button onclick='editItem(${json})' style="border:1px solid #ccc;background:white;padding:6px;border-radius:4px;cursor:pointer;">✏️</button><button onclick="deleteItem('${i.id}')" style="border:1px solid #ffcccc;background:#fff5f5;color:red;padding:6px;border-radius:4px;cursor:pointer;">🗑</button></div></div>`;
+        }).join('');
+    }
+
+    function editItem(i) { document.getElementById('itemId').value=i.id; document.getElementById('itemId').readOnly=true; document.getElementById('itemName').value=i.name; document.getElementById('itemUnit').value=i.unit; document.getElementById('itemStock').value=i.stock; document.getElementById('itemImage').value=i.image; }
+    function clearAdminForm() { ['itemId','itemName','itemStock','itemImage'].forEach(id=>document.getElementById(id).value=''); document.getElementById('itemId').readOnly=false; document.getElementById('itemUnit').value='อัน'; }
+    function saveItemAdmin() {
+        let payload = { action:"save_item", item:{id:document.getElementById('itemId').value, name:document.getElementById('itemName').value, unit:document.getElementById('itemUnit').value||'อัน', stock:document.getElementById('itemStock').value||0, image:document.getElementById('itemImage').value||''} };
+        fetch(API_URL, {method:"POST",body:JSON.stringify(payload)}).then(r=>r.json()).then(d=>{alert(d.message);clearAdminForm();fetchItems();});
+    }
+    function deleteItem(id) { if(confirm('ลบอุปกรณ์นี้?')) fetch(API_URL,{method:"POST",body:JSON.stringify({action:"delete_item",itemId:id})}).then(r=>r.json()).then(d=>{fetchItems();}); }
+
+    function renderAdminHistory(recs) {
+        document.getElementById('adminHistoryContainer').innerHTML = recs.map(r => `<div class="admin-list-item" style="display:block;"><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><div><strong style="color:var(--brand-red);">${r.orderId}</strong> <span style="font-size:12px;color:#888;">${new Date(r.timestamp).toLocaleDateString('th-TH')} | ${r.name}</span></div><button onclick="cancelOrder('${r.orderId}',${r.rowIdx})" style="border:1px solid red;background:transparent;color:red;border-radius:4px;font-size:11px;padding:4px 8px;cursor:pointer;">ยกเลิกบิล</button></div><div style="font-size:13px;background:#f9f9f9;padding:8px;border-radius:6px;white-space:pre-line;">${r.summary}</div></div>`).join('');
+    }
+    function cancelOrder(id, idx) { if(confirm('ยกเลิกบิลนี้และคืนของเข้าคลัง?')) fetch(API_URL,{method:"POST",body:JSON.stringify({action:"cancel_order",orderId:id,rowIdx:idx})}).then(r=>r.json()).then(d=>{alert(d.message);fetchItems();}); }
+
+    function populateMonthFilter() {
+        let sel = document.getElementById('reportMonthFilter'); sel.innerHTML = '<option value="all">ทั้งหมด</option>';
+        let mSet = new Set(); globalHistory.forEach(r=>{let d=new Date(r.timestamp); mSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);});
+        [...mSet].sort().reverse().forEach(m => sel.innerHTML+=`<option value="${m}">${m}</option>`);
+    }
+    function generateReport() {
+        let filter = document.getElementById('reportMonthFilter').value, stats = {};
+        globalItems.forEach(i => stats[i.name] = { orig:0, all:0, per:0, rem:parseInt(i.stock) });
+        globalHistory.forEach(r => { if(r.rawItems) try{JSON.parse(r.rawItems).forEach(i=>{if(stats[i.name])stats[i.name].all+=parseInt(i.qty)});}catch(e){} });
+        for(let k in stats) stats[k].orig = stats[k].rem + stats[k].all;
+        let filHist = globalHistory.filter(r => filter==='all'||`${new Date(r.timestamp).getFullYear()}-${String(new Date(r.timestamp).getMonth()+1).padStart(2,'0')}`===filter);
+        let totI = 0, top = '-', maxD = 0;
+        filHist.forEach(r => { if(r.rawItems) try{JSON.parse(r.rawItems).forEach(i=>{if(stats[i.name]){stats[i.name].per+=parseInt(i.qty); totI+=parseInt(i.qty);}});}catch(e){} });
+        document.getElementById('reportTotalOrders').innerText = filHist.length; document.getElementById('reportTotalItems').innerText = totI;
+        document.getElementById('reportTableBody').innerHTML = '';
+        for(let k in stats) {
+            let s = stats[k]; if(s.per>maxD){maxD=s.per;top=k;}
+            if(s.orig>0) document.getElementById('reportTableBody').innerHTML += `<tr><td>${k}</td><td align="center">${s.orig}</td><td align="center" style="color:red;font-weight:bold;">${s.per}</td><td align="center" style="color:green;font-weight:bold;">${s.rem}</td></tr>`;
+        }
+        document.getElementById('aiInsightBox').innerHTML = totI ? `<b>AI Insight:</b> ไอเทมยอดนิยมคือ <b>${top}</b> เบิกไป ${maxD} ชิ้น ${stats[top].rem<=20?'<br><span style="color:red;">⚠️ สต๊อกเหลือน้อย ควรเติมด่วน!</span>':''}` : 'ยังไม่มีข้อมูลการเบิกในช่วงเวลานี้';
+    }
+</script>
+</body>
+</html>
